@@ -1,7 +1,12 @@
 const Messages = require("../models/messageModel");
 const crypto = require('crypto');
 
+function generateRandomKey() {
+  return Math.floor(Math.random() * 25) + 1;
+}
 
+// Generate the random key once
+const secret_key = generateRandomKey();
 
 function encryptMessage(message, secret_key) {
   let encrypted = "";
@@ -26,7 +31,6 @@ function decryptMessage(encryptedMessage, secret_key) {
 module.exports.addMessage = async (req, res, next) => {
   try {
     const { from, to, message } = req.body;
-    const secret_key = crypto.randomInt(1, 26); // Generates a random integer between 1 and 25t key
 
     const encryptedMessage = encryptMessage(message, secret_key);
 
@@ -46,7 +50,6 @@ module.exports.addMessage = async (req, res, next) => {
 module.exports.getMessages = async (req, res, next) => {
   try {
     const { from, to } = req.body;
-    const secret_key = 8; // Replace this with your secret key
 
     const messages = await Messages.find({
       users: {
