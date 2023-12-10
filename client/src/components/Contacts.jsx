@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
+import Logout from "./Logout";
+import { FaCheckCircle } from "react-icons/fa";
+import { AiOutlineCheckCircle } from "react-icons/ai";
+
 
 const Contacts = ({ contacts, currentUser , changeChat}) => {
-    const [currentUserName, setCurrentUserName] = useState(undefined);
+  const [currentUserName, setCurrentUserName] = useState(undefined);
   const [currentUserImage, setCurrentUserImage] = useState(undefined);
   const [currentSelected, setCurrentSelected] = useState(undefined);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   useEffect( () => {
     if(currentUser){
@@ -18,6 +23,12 @@ const Contacts = ({ contacts, currentUser , changeChat}) => {
     setCurrentSelected(index);
     changeChat(contact);
   };
+
+   // Filter contacts based on search term
+  const filteredContacts = contacts.filter((contact) =>
+    contact.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
   return (
     <>
       {currentUserImage && currentUserImage && (
@@ -26,8 +37,16 @@ const Contacts = ({ contacts, currentUser , changeChat}) => {
             <img src={Logo} alt="logo" />
             <h3>ChatHub</h3>
           </div>
+          <div className="search" >
+            <input
+              type="text"
+              placeholder="Search contacts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <div className="contacts">
-            {contacts.map((contact, index) => {
+            {filteredContacts.map((contact, index) => {
               return (
                 <div
                   key={index}
@@ -59,19 +78,22 @@ const Contacts = ({ contacts, currentUser , changeChat}) => {
             <div className="username">
               <h2>{currentUserName}</h2>
             </div>
+            <Logout />
           </div>
         </Container>
       )}
     </>
   );
+
 }
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 75% 15%;
+  grid-template-rows: 5% 10% 70% 15%;
   overflow: hidden;
   background-color: #080420;
   .brand {
+    padding-top:1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -84,7 +106,33 @@ const Container = styled.div`
       text-transform: uppercase;
     }
   }
+  .search input {
+    margin-top:2rem;
+    width: 100%;
+    height: 60%;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background-color: #ffffff34;
+    &:focus {
+      outline: none;
+    }
+      color: white;
+      border: none;
+      padding-left: 1rem;
+      font-size: 1.2rem;
+
+      &::selection {
+        background-color: #9a86f3;
+      }
+      &:focus {
+        outline: none;
+      }
+    }
+
   .contacts {
+    margin-top:2rem;
     display: flex;
     flex-direction: column;
     align-items: center;

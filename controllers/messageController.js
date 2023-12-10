@@ -1,10 +1,37 @@
 const Messages = require("../models/messageModel");
+const crypto = require('crypto');
+
+
+
+function encryptMessage(message, secret_key) {
+  let encrypted = "";
+  for (let i = 0; i < message.length; i++) {
+    let ch = message.charCodeAt(i);
+    ch += secret_key;
+    encrypted += String.fromCharCode(ch);
+  }
+  return encrypted;
+}
+
+function decryptMessage(encryptedMessage, secret_key) {
+  let decrypted = "";
+  for (let i = 0; i < encryptedMessage.length; i++) {
+    let ch = encryptedMessage.charCodeAt(i);
+    ch -= secret_key;
+    decrypted += String.fromCharCode(ch);
+  }
+  return decrypted;
+}
 
 module.exports.addMessage = async (req, res, next) => {
   try {
     const { from, to, message } = req.body;
+    const secret_key = crypto.randomInt(1, 26); // Generates a random integer between 1 and 25t key
+
+    const encryptedMessage = encryptMessage(message, secret_key);
+
     const data = await Messages.create({
-      message: { text: message},
+      message: { text: encryptedMessage },
       users: [from, to],
       sender: from,
     });
@@ -16,10 +43,10 @@ module.exports.addMessage = async (req, res, next) => {
   }
 };
 
-
 module.exports.getMessages = async (req, res, next) => {
   try {
     const { from, to } = req.body;
+    const secret_key = 8; // Replace this with your secret key
 
     const messages = await Messages.find({
       users: {
@@ -27,17 +54,57 @@ module.exports.getMessages = async (req, res, next) => {
       },
     }).sort({ updatedAt: 1 });
 
-    const projectedMessages = messages.map((msg) => {
+    const decryptedMessages = messages.map((msg) => {
+      const decryptedMessage = decryptMessage(msg.message.text, secret_key);
       return {
         fromSelf: msg.sender.toString() === from,
-        message: msg.message.text,
+        message: decryptedMessage,
       };
     });
-    res.json(projectedMessages);
+
+    res.json(decryptedMessages);
   } catch (ex) {
     next(ex);
   }
 };
+// module.exports.addMessage = async (req, res, next) => {
+//   try {
+//     const { from, to, message } = req.body;
+//     const data = await Messages.create({
+//       message: { text: message},
+//       users: [from, to],
+//       sender: from,
+//     });
+
+//     if (data) return res.json({ msg: "Message added successfully." });
+//     else return res.json({ msg: "Failed to add message to the database" });
+//   } catch (ex) {
+//     next(ex);
+//   }
+// };
+
+
+// module.exports.getMessages = async (req, res, next) => {
+//   try {
+//     const { from, to } = req.body;
+
+//     const messages = await Messages.find({
+//       users: {
+//         $all: [from, to],
+//       },
+//     }).sort({ updatedAt: 1 });
+
+//     const projectedMessages = messages.map((msg) => {
+//       return {
+//         fromSelf: msg.sender.toString() === from,
+//         message: msg.message.text,
+//       };
+//     });
+//     res.json(projectedMessages);
+//   } catch (ex) {
+//     next(ex);
+//   }
+// };
 
 
 

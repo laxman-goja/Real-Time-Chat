@@ -95,11 +95,13 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
                                 type="video/mp4" controls
                             />
                             :
+                            <a href={`http://localhost:5000/${message.message}`} target="_blank" rel="noopener noreferrer">
                             <img
                                 style={{ maxWidth: '200px' }}
                                 src={`http://localhost:5000/${message.message}`}
                                 alt="img"
                             />
+                            </a>
                         :
                         <p>
                             {message.message}
