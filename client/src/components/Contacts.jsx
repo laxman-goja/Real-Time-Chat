@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
-import { FaCheckCircle } from "react-icons/fa";
-import { AiOutlineCheckCircle } from "react-icons/ai";
+
 
 
 const Contacts = ({ contacts, currentUser , changeChat}) => {

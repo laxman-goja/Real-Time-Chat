@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const MessageSchema = mongoose.Schema(
   {
+    originalMessage: { type: String, required: true },
     message: {
       text: { type: String, required: true },
     },
